@@ -11,8 +11,9 @@ There are two scripts in this repo, one is the `s3sync.sh` script which simply u
 
 I mainly included the `s3sync.sh` script just because that's how I originally checked if the file was available, and thats how I would have checked on a cloud environment.
 
-1. make the `npi-data/` directory in the root directory of the project, and adjust the CONFIG_VARIABLES at the top of the `app.py` file if needed to match your environment.
-   The `app.py` file is the main script, and it can be run with the following command (from the src directory):
+1. Make the `npi-data/` directory in the root directory of the project, and adjust the CONFIG_VARIABLES at the top of the `app.py` file if needed to match your environment.
+   
+2. The `app.py` file is the main script, and should be run with the following command (from the `/src` directory):
 ```bash
 python3 app.py
 ```
