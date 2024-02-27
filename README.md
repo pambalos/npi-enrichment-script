@@ -45,7 +45,7 @@ python3 app.py
 - Tests could be good. Although by its nature of being a script, it's pretty easy to test manually.
 - If I wanted to invest more time, I would add some overarching daily handler. Either set it up as a timed function in a constantly running app that runs once a day, or set it up as a cron job, both of which have their advantages depending on the use case.
 - There are some extraneous libraries in the requirements.txt file from my dev environment, I would remove them if I was going to use this in a production environment.
-- Depending on how much load the second API can handle, I want to increase or decrease the number of worker threads.
+- Depending on how much load the second API can handle, I might want to increase or decrease the number of worker threads.
 - For example, I ran it again today to see how it performed, and it took 3 minutes to run, a drastic improvement, but it also completely failed to fetch one of the npi numbers data. As such, perhaps I lower the max wait time but increase the number of retries on the request setup.
   - The setup with a single failure included `MAX_RETRIES = 5,
     MAX_WAIT = 60,
