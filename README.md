@@ -39,6 +39,13 @@ python3 app.py
   - If I wanted a live and updated resource that I could use internally to quickly fetch information on NPI numbers, and I know I will mainly be accessing it via the NPI number, I would probably opt for a NoSQL database like MongoDB.
   - Alternatively, if I planned on building a larger set of records, one which might rope in further separate but relational data sources, and I can envision building APIs with index based queries, I would probably opt for a SQL database.
 - I decided to manually build in the create directory step just for ease of use.
+- Too much concurrency while writing could definitely slow things down as threads have to wait and compete for locks. I wanted to test my initial thoughts that async fetches, then synchronous writes could be faster than asynchronous fetches and writes. The results are as follows;
+  - Initial test with `THREADS=20, MAX_RETRIES=10, MAX_WAIT=15, WAIT=3, ASYNC_WRITES=True` took 61 seconds to run, the second took 50 seconds
+  - Initial test with `THREADS=20, MAX_RETRIES=10, MAX_WAIT=15, WAIT=3, ASYNC_WRITES=False` took 59 seconds to run, the second took 70 seconds
+  - Another test with `THREADS=200, MAX_RETRIES=10, MAX_WAIT=15, WAIT=3, ASYNC_WRITES=True` took 28 seconds to run
+  - - Another test with `THREADS=200, MAX_RETRIES=10, MAX_WAIT=15, WAIT=3, ASYNC_WRITES=False` took 43 seconds to run
+  - Clearly I was wrong about my initial predictions regarding being able to perceive the trade-off. More in #Lessons Learnt
+
 ### Improvements
 - Tests could be good. Although by its nature of being a script, it's pretty easy to test manually.
 - If I wanted to invest more time, I would add some overarching daily handler. Either set it up as a timed function in a constantly running app that runs once a day, or set it up as a cron job, both of which have their advantages depending on the use case.
@@ -52,3 +59,9 @@ python3 app.py
   - The second is to add a run option which checks if all the npi_numbers have been fetched properly for the day, then fetch any missing ones (maybe from script failures caused by machine outages or anything else)
   - A third is to add the option to input any of the CONFIG_VARIABLES at run time, to offer greater flexibility and ease of use when running the script remotely from some management system.
 - Another improvement that could be made is to add a locking mechanism to handle the writing of the files, for asynchronously managed writes (I may actually do this anyway just for fun...)
+
+## Lessons Learnt
+- My initial prediction that I would be able to see the performance trade-off with async writes turned out to be wrong. I think there are a numer of reasons for this; 
+  - I think that the thread-to-file ratio isn't high enough to see a significant difference in performance. If there were more threads and fewer files, I think we would see a bit of a difference.
+- Initially I ran into some trouble with the mutex Locks, but that was because I had accidentally imported the multiprocessing library instead of the threading library, so I know I need to be careful with that in the future.
+- Greater concurrency seems to be the way to go, and definitely has all the advantages in regard to performance, but when implemented, it should to be done carefully and thoughtfully, and ideally, with a ton of performance testing!
