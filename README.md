@@ -47,6 +47,8 @@ python3 app.py
 - For example, I ran it again today to see how it performed, and it took 3 minutes to run, a drastic improvement, but it also completely failed to fetch one of the npi numbers data. As such, perhaps I lower the max wait time but increase the number of retries on the request setup.
   - The setup with a single failure included `MAX_RETRIES = 5, MAX_WAIT = 60, WAIT = 3, THREADS = 20` 
   - Today I changed it to `MAX_RETRIES = 10, MAX_WAIT = 30, WAIT = 3, THREADS = 20` and managed to get all the data in a minute.
-- Another improvement I would make is to make it adaptable for re-runs for failed npi_numbers, as well as build in a mechanism to double check if all the NPI numbers have been properly fetched. Generally I would want to make it bit more configurable on two main points
+- Another improvement I would make is to make it adaptable for re-runs for failed npi_numbers, as well as build in a mechanism to double-check if all the NPI numbers have been properly fetched. Generally I would want to make it bit more configurable on a number of points
   - The first is an added option via script arguments to re-run the script on the list of failed npi_numbers the main script generates
   - The second is to add a run option which checks if all the npi_numbers have been fetched properly for the day, then fetch any missing ones (maybe from script failures caused by machine outages or anything else)
+  - A third is to add the option to input any of the CONFIG_VARIABLES at run time, to offer greater flexibility and ease of use when running the script remotely from some management system.
+- Another improvement that could be made is to add a locking mechanism to handle the writing of the files, for asynchronously managed writes (I may actually do this anyway just for fun...)
