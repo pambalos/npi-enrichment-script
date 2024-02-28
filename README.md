@@ -43,11 +43,10 @@ python3 app.py
 - Tests could be good. Although by its nature of being a script, it's pretty easy to test manually.
 - If I wanted to invest more time, I would add some overarching daily handler. Either set it up as a timed function in a constantly running app that runs once a day, or set it up as a cron job, both of which have their advantages depending on the use case.
 - There are some extraneous libraries in the requirements.txt file from my dev environment, I would remove them if I was going to use this in a production environment.
-- Depending on how much load the second API can handle, I want to increase or decrease the number of worker threads.
+- Depending on how much load the second API can handle, I might want to increase or decrease the number of worker threads.
 - For example, I ran it again today to see how it performed, and it took 3 minutes to run, a drastic improvement, but it also completely failed to fetch one of the npi numbers data. As such, perhaps I lower the max wait time but increase the number of retries on the request setup.
-  - The setup with a single failure included `MAX_RETRIES = 5, MAX_WAIT = 60, WAIT = 3, THREADS = 20` but changed it to `MAX_RETRIES = 10, MAX_WAIT = 30, WAIT = 3, THREADS = 20` and managed to get all the data in a minute.
+  - The setup with a single failure included `MAX_RETRIES = 5, MAX_WAIT = 60, WAIT = 3, THREADS = 20` 
+  - Today I changed it to `MAX_RETRIES = 10, MAX_WAIT = 30, WAIT = 3, THREADS = 20` and managed to get all the data in a minute.
 - Another improvement I would make is to make it adaptable for re-runs for failed npi_numbers, as well as build in a mechanism to double check if all the NPI numbers have been properly fetched. Generally I would want to make it bit more configurable on two main points
   - The first is an added option via script arguments to re-run the script on the list of failed npi_numbers the main script generates
   - The second is to add a run option which checks if all the npi_numbers have been fetched properly for the day, then fetch any missing ones (maybe from script failures caused by machine outages or anything else)
-
-
