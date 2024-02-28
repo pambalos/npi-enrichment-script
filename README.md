@@ -10,10 +10,8 @@ This is a simple couple of scripts that download NPI numbers from the S3 item gi
 There are two scripts in this repo, one is the `s3sync.sh` script which simply uses the aws cli to download the files from the s3 bucket, and the main python `app.py` script which does everything. 
 
 I mainly included the `s3sync.sh` script just because that's how I originally checked if the file was available, and thats how I would have checked on a cloud environment.
-
-1. Make the `npi-data/` directory in the root directory of the project, and adjust the CONFIG_VARIABLES at the top of the `app.py` file if needed to match your environment.
-   
-2. The `app.py` file is the main script, and should be run with the following command (from the `/src` directory):
+ 
+1. The `app.py` file is the main script, and should be run with the following command (from the `/src` directory):
 ```bash
 python3 app.py
 ```
@@ -40,7 +38,7 @@ python3 app.py
 - I also was considering what database I would use to save this data more long-term, and the format for it. 
   - If I wanted a live and updated resource that I could use internally to quickly fetch information on NPI numbers, and I know I will mainly be accessing it via the NPI number, I would probably opt for a NoSQL database like MongoDB.
   - Alternatively, if I planned on building a larger set of records, one which might rope in further separate but relational data sources, and I can envision building APIs with index based queries, I would probably opt for a SQL database.
-
+- I decided to manually build in the create directory step just for ease of use.
 ### Improvements
 - Tests could be good. Although by its nature of being a script, it's pretty easy to test manually.
 - If I wanted to invest more time, I would add some overarching daily handler. Either set it up as a timed function in a constantly running app that runs once a day, or set it up as a cron job, both of which have their advantages depending on the use case.
@@ -50,6 +48,6 @@ python3 app.py
   - The setup with a single failure included `MAX_RETRIES = 5,
     MAX_WAIT = 60,
     WAIT = 3,
-    THREADS = 20` but perhaps I would change it to `MAX_RETRIES = 10, MAX_WAIT = 30,
+    THREADS = 20` but changed it to `MAX_RETRIES = 10, MAX_WAIT = 30,
     WAIT = 3,
-    THREADS = 20` or something similar.
+    THREADS = 20` and managed to get all the data in a minute.

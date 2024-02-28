@@ -18,8 +18,8 @@ NPI_DATA_DIRECTORY = BASE_FILE_PATH + "npi-data/"
 NPI_DATA_FILE_PREFIX = NPI_DATA_DIRECTORY + "npi_data_"
 BUCKET_NAME = "reach-interview-data"
 CMS_API_URL = "https://6irj0rgv1k.execute-api.us-east-2.amazonaws.com/test?npi="
-MAX_RETRIES = 5
-MAX_WAIT = 60
+MAX_RETRIES = 10
+MAX_WAIT = 30
 WAIT = 3
 THREADS = 20
 
@@ -83,6 +83,7 @@ def mark_failed_npi(npi):
 def create_npi_data():
     current_date = datetime.date.today().strftime("%d-%m-%Y")
     start_time = time.time()
+    create_npi_data_directory()
     npi_numbers = set(get_npi_numbers())
     print(f"# of NPI numbers: {str(len(npi_numbers))} for {current_date}")
 
@@ -105,6 +106,11 @@ def create_npi_data():
     print(f"Time taken: {end_time - start_time} seconds")
 
 
+# Method to create the directory to save the NPI data if it doesn't exist
+def create_npi_data_directory():
+    if not os.path.exists(NPI_DATA_DIRECTORY):
+        os.makedirs(NPI_DATA_DIRECTORY)
+
 # Method to get the data from the CMS API using the NPI number and return the response or None if the request fails
 # Also returns the NPI number so that we can mark it as failed if the request fails
 def get_npi_data_from_npi_url(npi):
@@ -120,12 +126,12 @@ def save_npi_data(current_date, state, data):
     prepped_data = prep_for_csv(data)
     this_file = f"{NPI_DATA_FILE_PREFIX}{current_date}_{state}.csv"
     if not os.path.exists(this_file):
-        with open(this_file, "a") as new_file:
+        with open(this_file, "a+") as new_file:
             csv_writer = csv.writer(new_file, delimiter=",", lineterminator="\n")
             csv_writer.writerow(prepped_data.keys())
             csv_writer.writerow(prepped_data.values())
     else:
-        with open(this_file, "a") as file:
+        with open(this_file, "a+") as file:
             csv_writer = csv.writer(file, delimiter=",", lineterminator="\n")
             csv_writer.writerow(prepped_data.values())
 
