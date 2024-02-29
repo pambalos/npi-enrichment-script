@@ -75,8 +75,8 @@ def make_request(url, retries=MAX_RETRIES, wait=WAIT, max_wait=MAX_WAIT):
             return resp
         else:
             sleep_time = min(math.pow(wait, i), max_wait)
-            print(f"Failed to get data from {url} on attempt {i}. Retrying in {sleep_time} seconds...")
             time.sleep(sleep_time)
+    print(f"Failed to get data from {url} after {retries} retries.")
     return None
 
 
@@ -114,6 +114,7 @@ def create_npi_data():
                 for future in cf.as_completed(futures):
                     try:
                         npi = future.result()
+                        print(f"Finished saving data for NPI number {npi}, counter: {counter}")
                         npi_numbers.remove(npi)
                         counter += 1
                     except Exception as e:
@@ -124,6 +125,7 @@ def create_npi_data():
                     try:
                         npi, data = future.result()
                         check_and_handle_npi_data(npi, data, current_date)
+                        print(f"Finished saving data for NPI number {npi}, counter: {counter}")
                         npi_numbers.remove(npi)
                         counter += 1
                     except Exception as e:
@@ -133,7 +135,7 @@ def create_npi_data():
 
     end_time = time.time()
     print(f"Finished saving data for {current_date}")
-    print(f"Time taken: {end_time - start_time} seconds, fetched adn recorded {counter} NPI numbers.")
+    print(f"Time taken: {end_time - start_time} seconds, fetched and recorded {counter} NPI numbers.")
 
 
 def async_error_callback(error):

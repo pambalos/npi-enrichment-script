@@ -32,6 +32,7 @@ python3 app.py
   - Secondly, after considering saving the data as a JSON Object I came up with two issues;
     - The first was that simply adding a JSON object to each new line of the file would not be a valid JSON file, 
     - The second was that I would have to read the entire file into memory to append the new JSON object to the end of the file or construct the file manually which I don't like.
+    - If I were using a mongoDB, I would probably just save each item as a separate document, but I decided to go with a CSV file for simplicity in this case.
 - I also considered using the Pandas library to handle the data, but I decided against it because I was only fetching the data from the API and saving it to a file. Although I did need to do some data manipulation, I decided a simple recursive function to flatten the JSON data structures was sufficient.
 - I decided to use a ThreadPoolExecutor to handle the API requests because I was making a lot of requests, and after my initial test took >10 minutes to run, I wanted to make them concurrently. 
 - I decided to just add CONFIG_VARIABLES at the top of the file because I didn't want to add a whole new library just to handle a couple of variables.
@@ -58,10 +59,27 @@ python3 app.py
   - The first is an added option via script arguments to re-run the script on the list of failed npi_numbers the main script generates
   - The second is to add a run option that checks if all the npi_numbers have been fetched properly for the day, then fetches any missing ones (maybe from script failures caused by machine outages or anything else)
   - A third is to add the option to input any of the CONFIG_VARIABLES at run time, to offer greater flexibility and ease of use when running the script remotely from some management system.
-- Another improvement that could be made is to add a locking mechanism to handle the writing of the files, for asynchronously managed writes (I may do this anyway just for fun...)
+- Another improvement that could be made is to add a locking mechanism to handle the writing of the files, for asynchronously managed writes (I may do this anyway just for fun...) (Done!)
+- I also wanted to mention how I can envision connecting this script to a Kafka cluster and setting it up as a producer to a topic so that other services in the ecosystem can subscribe to the topic and consume the data quite easily.
+- I might also remove the individual npi completion logs so the logs take up less space on the machine.
 
 ## Lessons Learnt
 - My initial prediction that I would be able to see the performance trade-off with async writes turned out to be wrong. I think there are several reasons for this; 
   - I think that the thread-to-file ratio isn't high enough to see a significant difference in performance. If there were more threads and fewer files, I think we would see a bit of a difference.
 - Initially, I ran into some trouble with the mutex Locks, but that was because I had accidentally imported the multiprocessing library instead of the threading library, so I know I need to be careful with that in the future.
 - Greater concurrency seems to be the way to go and has all the advantages with performance, but when implemented, it should be done carefully and thoughtfully, and ideally, with a ton of performance testing!
+
+
+## Edits
+### 2024-02-27
+- Added a make directory call to the program and updated readme.
+
+### 2024-02-28
+- Added asynchronous file writing, along with Mutex to handle that.
+- Added loop till done functionality.
+- Added some run config.
+
+### 2024-02-29
+- Added some more run config.
+- Added some notes on improvement and added Edits section to the README.md
+
