@@ -24,7 +24,8 @@ MAX_RETRIES = 10
 MAX_WAIT = 15
 WAIT = 3
 THREADS = 200
-ASYNC_WRITES = False
+ASYNC_WRITES = True
+LOOP_TILL_DONE = False
 
 # Variables for asyncIO mutex locks - need to preset the locks since no one fetch request will be returning all 50
 # states + None and Failed
@@ -127,6 +128,8 @@ def create_npi_data():
                         counter += 1
                     except Exception as e:
                         async_error_callback(e)
+            if not LOOP_TILL_DONE:
+                break
 
     end_time = time.time()
     print(f"Finished saving data for {current_date}")
