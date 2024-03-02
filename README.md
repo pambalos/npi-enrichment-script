@@ -16,6 +16,28 @@ I mainly included the `s3sync.sh` script just because that's how I originally ch
 python3 app.py
 ```
 
+## Configuration
+The `app.py` script can be configured by modifying the following variables at the top of the script:
+- ```CURRENT_DATE_KEY```: The key to use for the current date post-fix for the file names
+- ```NPI_FILE```: The file name of the NPI list to download from S3
+- ```FAILED_NPI_FILE```: The file name to record failed NPI numbers
+- ```BASE_FILE_PATH```: The base file path to save the files to (setup to run from the `/src` directory)
+- ```NPI_DATA_DIRECTORY```: The directory to save the NPI data to
+- ```NPI_DATA_FILE_PREFIX```: The prefix to use for the NPI data files
+- ```BUCKET_NAME```: The name of the S3 bucket to download the NPI list from
+- ```CMS_API_URL```: The URL of the CMS API to fetch the NPI data from
+- ```MAX_RETRIES```: The number of times to retry a failed request
+- ```MAX_WAIT```: The maximum time to wait between retries (exponential backoff)
+- ```WAIT```: The default time to wait between requests
+- ```THREADS```: The number of threads to use for concurrent requests
+- ```ASYNC_WRITES```: Whether to use asynchronous writes or not
+- ```LOOP_TILL_DONE```: Whether to loop till all NPI numbers are fetched or not
+- ```PRE_REQUEST_SLEEP_RANGE```: The range of time to sleep before making a request, used to help avoid rate limiting/overloading the API
+
+## Script Output
+The script will write the results to csv files in the npi_data directory, one for each state, plus None and Failed. This can be configured using the above configuration variables.
+
+
 ## Notes
 
 ### Assumptions

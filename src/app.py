@@ -2,6 +2,7 @@ import csv
 import datetime
 import math
 import os.path
+import random
 import time
 from threading import Lock
 
@@ -12,7 +13,7 @@ from botocore import UNSIGNED
 from botocore.config import Config
 
 # Configuration variables
-CURRENT_DATE = datetime.date.today().strftime("%d-%m-%Y")
+CURRENT_DATE_KEY = datetime.date.today().strftime("%d-%m-%Y")
 NPI_FILE = "npi_list.txt"
 FAILED_NPI_FILE = "failed_npi_list.txt"
 BASE_FILE_PATH = "../"
@@ -26,6 +27,7 @@ WAIT = 3
 THREADS = 200
 ASYNC_WRITES = True
 LOOP_TILL_DONE = False
+PRE_REQUEST_SLEEP_RANGE = 15  # Seconds to sleep before making a request - used so we don't overload the API
 
 # Variables for asyncIO mutex locks - need to preset the locks since no one fetch request will be returning all 50
 # states + None and Failed
@@ -37,7 +39,7 @@ FILE_LOCK_KEYS = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "H
 
 # method to get NPI numbers from file or S3 bucket, depending on if the bash script using awscli has already run or not
 # also only take the numbers from [1:] to avoid the header
-def get_npi_numbers(file_path=BASE_FILE_PATH + CURRENT_DATE + "-" + NPI_FILE):
+def get_npi_numbers(file_path=BASE_FILE_PATH + CURRENT_DATE_KEY + "-" + NPI_FILE):
     if not os.path.exists(file_path):
         print(f"File {file_path} does not exist. Getting NPI numbers from S3 bucket...")
         return get_npi_boto()
@@ -59,7 +61,7 @@ def get_npi_boto():
     resp = requests.get(object_url)
     if resp.status_code == 200:
         content = resp.content.decode("utf-8").split()[1:]
-        with open(BASE_FILE_PATH + CURRENT_DATE + "-" + NPI_FILE, "a") as file:
+        with open(BASE_FILE_PATH + CURRENT_DATE_KEY + "-" + NPI_FILE, "a") as file:
             file.write(resp.content.decode("utf-8"))
             file.close()
         return content
@@ -69,6 +71,7 @@ def get_npi_boto():
 
 # Exponential backoff method to retry the requests to the CMS API
 def make_request(url, retries=MAX_RETRIES, wait=WAIT, max_wait=MAX_WAIT):
+    time.sleep(random.randint(0, PRE_REQUEST_SLEEP_RANGE))  # random sleep so that all threads dont request at the same time
     for i in range(1, retries + 1):
         resp = requests.get(url)
         if resp.status_code == 200:
@@ -82,7 +85,7 @@ def make_request(url, retries=MAX_RETRIES, wait=WAIT, max_wait=MAX_WAIT):
 
 # Method to mark the NPI number failed if the request to the CMS API fails
 def mark_failed_npi(npi, file_locks=None):
-    failed_path = BASE_FILE_PATH + CURRENT_DATE + "-" + FAILED_NPI_FILE
+    failed_path = BASE_FILE_PATH + CURRENT_DATE_KEY + "-" + FAILED_NPI_FILE
     if file_locks is not None:
         lock = file_locks.get("Failed")
         with lock:
