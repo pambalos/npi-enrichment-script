@@ -117,9 +117,9 @@ def create_npi_data():
                 for future in cf.as_completed(futures):
                     try:
                         npi = future.result()
-                        print(f"Finished saving data for NPI number {npi}, counter: {counter}")
                         npi_numbers.remove(npi)
                         counter += 1
+                        print(f"Finished saving data for NPI number {npi}, counter: {counter}")
                     except Exception as e:
                         async_error_callback(e)
             else:
